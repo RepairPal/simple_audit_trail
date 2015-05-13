@@ -2,6 +2,9 @@
 
 ## Synopsis
 
+Use to create an audit trail of field changes in a model, storing what was 
+changed and who changed it. 
+
 **Setup**
 
 1. Add to your Gemfile: ``` gem 'simple_audit_trail ```
