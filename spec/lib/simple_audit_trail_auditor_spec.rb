@@ -26,10 +26,12 @@ describe SimpleAuditTrail::Auditor do
         )
         @tina.reload
       end
+
       context "when not configured to ignore user" do
-        context "when audited fields have changed" do
+        context "when all audited fields have changed" do
           before do
             @tina.badonkadonks = 1
+            @tina.ladies = 1
 
             # requires an audited_user_id
             @tina.audited_user_id = 123
@@ -43,7 +45,7 @@ describe SimpleAuditTrail::Auditor do
 
           context "the newly created simple_audits record" do
             before do
-              @tina.save!
+              @tina.save
             end
 
             it "is an instance of SimpleAuditTrail::Audit" do
@@ -54,13 +56,35 @@ describe SimpleAuditTrail::Auditor do
               expect(JSON.parse(@tina.simple_audits.last.from)).
                 to eq JSON.parse("{\"ladies\":0,\"badonkadonks\":0}")
             end
+
             it "has a json hash for what the audited values are" do
               expect(JSON.parse(@tina.simple_audits.last.to)).
-                to eq JSON.parse("{\"ladies\":0,\"badonkadonks\":1}")
+                to eq JSON.parse("{\"ladies\":1,\"badonkadonks\":1}")
             end
+
             it "has a who_id for the user who made the change" do
               expect(@tina.simple_audits.last.who_id).to eq 123
             end
+          end
+        end
+
+        context "when some but not all audited fields have changed then" do
+          before do
+            @tina.badonkadonks = 1
+
+            # requires an audited_user_id
+            @tina.audited_user_id = 123
+            @tina.save
+          end
+
+          it "has a json hash for what only the changed audited values were" do
+            expect(JSON.parse(@tina.simple_audits.last.from)).
+              to eq JSON.parse("{\"badonkadonks\":0}")
+          end
+
+          it "has a json hash for what only the changed audited values are" do
+            expect(JSON.parse(@tina.simple_audits.last.to)).
+              to eq JSON.parse("{\"badonkadonks\":1}")
           end
         end
 
@@ -70,8 +94,13 @@ describe SimpleAuditTrail::Auditor do
               That's Mushy Snugglebites' badonkadonk. She's my main squeeze.
               Lady's got a gut fulla' dynamite and a booty like POOOW!
              "
-            @tina.audited_user_id = 123
           end
+
+          it "does not raise an Exception even if no auditor is set" do
+            expect(@tina.audited_user_id).to be_blank
+            expect { @tina.save }.to_not raise_error
+          end
+
           it "does not create a SimpleAuditTrail::Audit record" do
             expect{
               @tina.save
