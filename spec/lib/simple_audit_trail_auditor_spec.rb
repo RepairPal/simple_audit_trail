@@ -65,6 +65,10 @@ describe SimpleAuditTrail::Auditor do
             it "has a who_id for the user who made the change" do
               expect(@tina.simple_audits.last.who_id).to eq 123
             end
+
+            it "has an empty unchanged value" do
+              expect(JSON.parse(@tina.simple_audits.last.unchanged)).to be_empty
+            end
           end
         end
 
@@ -77,14 +81,19 @@ describe SimpleAuditTrail::Auditor do
             @tina.save
           end
 
-          it "has a json hash for what all the audited values were" do
+          it "has a json hash in `from` for what the changed audited values were" do
             expect(JSON.parse(@tina.simple_audits.last.from)).
-              to eq JSON.parse("{\"ladies\":0,\"badonkadonks\":0}")
+              to eq JSON.parse("{\"badonkadonks\":0}")
           end
 
-          it "has a json hash for what all the audited values are" do
+          it "has a json hash in `to` for what the changed audited values are" do
             expect(JSON.parse(@tina.simple_audits.last.to)).
-              to eq JSON.parse("{\"ladies\":0,\"badonkadonks\":1}")
+              to eq JSON.parse("{\"badonkadonks\":1}")
+          end
+
+          it "has a json hash in `unchanged` for what the unmodified audited values are" do
+            expect(JSON.parse(@tina.simple_audits.last.unchanged)).
+              to eq JSON.parse("{\"ladies\":0}")
           end
         end
 

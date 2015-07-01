@@ -31,13 +31,20 @@ module SimpleAuditTrail
               raise "audited setter method called without setting audited_user_id"
             end
 
-            to = Hash[audited_fields.map { |f| [f, send(f)] }]
-            from = Hash[audited_fields.map { |f| [f, send("#{f}_was")] }]
+            to = Hash[changed_audited_fields.map { |f| [f, send(f)] }]
+            from = Hash[changed_audited_fields.map { |f| [f, send("#{f}_was")] }]
+            unchanged = Hash[
+              (audited_fields - changed_audited_fields).map do |f|
+                [f, send(f)]
+              end
+            ]
 
             simple_audits.create(
               :from => from.to_json,
               :to => to.to_json,
-              :who_id => audited_user_id)
+              :unchanged => unchanged.to_json,
+              :who_id => audited_user_id
+            )
           end
         end
       end
