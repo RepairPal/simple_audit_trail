@@ -22,19 +22,22 @@ module SimpleAuditTrail
 
         before_update :save_audits
         define_method :save_audits do
-          if self.audited_user_id.nil? && self.audit_options[:require_audited_user_id]
-            raise "audited setter method called without setting audited_user_id"
+          changed_audited_fields = audited_fields.select do |f|
+            send "#{f}_changed?"
           end
-          if (self.changed & self.audited_fields).any?
-            to = Hash[self.audited_fields.map{|k| [k,self[k]]}]
-            from = to.clone.merge! Hash[
-              self.changes.slice(*self.audited_fields).map{|k,v| [k,v[0]]}
-            ]
 
-            self.simple_audits.create(
+          if changed_audited_fields.present?
+            if audited_user_id.nil? && audit_options[:require_audited_user_id]
+              raise "audited setter method called without setting audited_user_id"
+            end
+
+            to = Hash[audited_fields.map { |f| [f, send(f)] }]
+            from = Hash[audited_fields.map { |f| [f, send("#{f}_was")] }]
+
+            simple_audits.create(
               :from => from.to_json,
               :to => to.to_json,
-              :who_id => self.audited_user_id)
+              :who_id => audited_user_id)
           end
         end
       end
