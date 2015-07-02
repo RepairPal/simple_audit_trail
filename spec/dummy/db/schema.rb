@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150513221356) do
+ActiveRecord::Schema.define(:version => 20150701174723) do
 
   create_table "mr_torques", :force => true do |t|
     t.string   "todays_quote"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(:version => 20150513221356) do
     t.text     "to"
     t.datetime "created_at",                  :null => false
     t.datetime "updated_at",                  :null => false
+    t.text     "unchanged"
   end
 
   create_table "tinas", :force => true do |t|
