@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple_audit_trail (0.0.3)
+    simple_audit_trail (0.0.4)
       rails (~> 3.2, >= 3.2.21)
 
 GEM
