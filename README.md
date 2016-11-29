@@ -1,5 +1,5 @@
 # Simple Audit Trail
-
+# ** master branch and 0.0.x gem versions is Rails 3x, for the rails 4 compatible gem, use the 1.x.x gem versions and the rails_4 branch**
 ## Synopsis
 
 Use to create an audit trail of field changes in a model, storing what was 
