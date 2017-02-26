@@ -1,9 +1,9 @@
 # Simple Audit Trail
-# ** master branch and 0.0.x gem versions is Rails 3x, for the rails 4 compatible gem, use the 1.x.x gem versions and the rails_4 branch**
+# ** rails_3 branch and 0.0.x gem versions is Rails 3x, for the rails 4 compatible gem, use the 1.x.x gem versions and the master branch**
 ## Synopsis
 
-Use to create an audit trail of field changes in a model, storing what was 
-changed and who changed it. 
+Use to create an audit trail of field changes in a model, storing what was
+changed and who changed it.
 
 **Setup**
 
@@ -13,12 +13,12 @@ changed and who changed it.
 1. Migrate: ``` rake db:migrate ```
 
 
-1. You must have a current_user method in your app. If not, you'll need to override 
-``` simple_audit_trail_who_id ``` to provide a user id 
+1. You must have a current_user method in your app. If not, you'll need to override
+``` simple_audit_trail_who_id ``` to provide a user id
 
 **Model**
 
-``` 
+```
 class Thing < ActiveRecord::Base
   audit [:some_field, :some_other_field]
 end
@@ -27,13 +27,13 @@ end
 
 **Usage**
 
-Thing instances now have an attribute, ` audited_user_id `. 
+Thing instances now have an attribute, ` audited_user_id `.
 
-You must set this on the object before you save it with changes to the audited 
+You must set this on the object before you save it with changes to the audited
 fields, or the audit attempt will fail, and raise an exception.
- 
-Assuming you have the above model, and that your controller has access to the 
-usual `current_user` method, you could do something like: 
+
+Assuming you have the above model, and that your controller has access to the
+usual `current_user` method, you could do something like:
 
 ```ruby
   t = Thing.find(1)
@@ -46,6 +46,5 @@ usual `current_user` method, you could do something like:
 
 which would generate a record in ` t.simple_audits `
 
-* If you don't wish to track users, but just track changes, 
+* If you don't wish to track users, but just track changes,
 add ` :require_audited_user_id => false ` to your `audit` call.
-
