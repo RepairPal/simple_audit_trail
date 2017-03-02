@@ -13,7 +13,6 @@ module SimpleAuditTrail
         self.audit_options = { :require_audited_user_id => true }.merge(options)
 
         attr_accessor :audited_user_id
-        attr_accessible :audited_user_id
 
         has_many :simple_audits,
                  :as => :simple_audit_trailable,
