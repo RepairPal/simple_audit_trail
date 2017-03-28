@@ -8,12 +8,12 @@ describe SimpleAuditTrail::Auditor do
   describe "audited model" do
     it "can call #audit" do
         expect {
-          Tina.create(:badonkadonks => 2, :ladies => 1)
+          Tina.create(:badonkadonks => 2, :ladies => 1, :audited_user_id => 123)
         }.to_not raise_error
     end
 
     it "has an audited_fields attribute" do
-      t = Tina.create(:badonkadonks => 2, :ladies => 1)
+      t = Tina.create(:badonkadonks => 2, :ladies => 1, :audited_user_id => 123)
 
       expect(t.audited_fields).to match_array(["badonkadonks", "ladies"])
     end
@@ -22,7 +22,8 @@ describe SimpleAuditTrail::Auditor do
       before do
         @tina = Tina.create(
           :badonkadonks => 0,
-          :ladies => 0
+          :ladies => 0,
+          :audited_user_id => 123
         )
         @tina.reload
       end
@@ -106,7 +107,7 @@ describe SimpleAuditTrail::Auditor do
           end
 
           it "does not raise an Exception even if no auditor is set" do
-            expect(@tina.audited_user_id).to be_blank
+            @tina.audited_user_id = nil
             expect { @tina.save }.to_not raise_error
           end
 
