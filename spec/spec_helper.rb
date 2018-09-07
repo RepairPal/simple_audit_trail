@@ -1,6 +1,6 @@
 ENV['RAILS_ENV'] ||= 'test'
 
-require_relative "dummy/config/environment"
+require_relative 'dummy/config/environment'
 
 require 'rspec/rails'
 require 'factory_girl_rails'
@@ -17,7 +17,7 @@ RSpec.configure do |config|
 
   config.infer_base_class_for_anonymous_controllers = false
 
-  config.order = "random"
+  config.order = 'random'
 
   config.use_transactional_fixtures = false
 
