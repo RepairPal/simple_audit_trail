@@ -3,7 +3,7 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative 'dummy/config/environment'
 
 require 'rspec/rails'
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'database_cleaner'
 require 'byebug'
 
