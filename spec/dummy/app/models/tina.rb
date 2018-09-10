@@ -1,3 +1,3 @@
 class Tina < ActiveRecord::Base
-  audit [:ladies, :badonkadonks]
+  audit %i[ladies badonkadonks]
 end
