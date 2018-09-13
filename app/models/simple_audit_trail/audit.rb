@@ -9,7 +9,7 @@ module SimpleAuditTrail
 
     def set_location_fields
       self.trace ||= caller.select do |entry|
-        !(entry =~ /#{__FILE__}/) && (entry[0] != "/" || entry =~ /#{Rails.root}/)
+        !(entry =~ /#{__FILE__}/) && (entry[0] != "/" || entry =~ /#{Rails.root}\/[^b]/)
       end.join("\n")
       match = trace.match(/(\w+)_controller.rb.*`(\w+)'/)
       c, a = match && match[1..-1]
