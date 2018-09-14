@@ -1,35 +1,35 @@
 require 'spec_helper'
 
 describe SimpleAuditTrail::Auditor do
-  it "adds audit method to ActiveRecord::Base" do
+  it 'adds audit method to ActiveRecord::Base' do
     expect(ActiveRecord::Base).to respond_to(:audit)
   end
 
-  describe "audited model" do
-    it "can call #audit" do
-        expect {
-          Tina.create(:badonkadonks => 2, :ladies => 1, :audited_user_id => 123)
-        }.to_not raise_error
+  describe 'audited model' do
+    it 'can call #audit' do
+      expect {
+        Tina.create(badonkadonks: 2, ladies: 1, audited_user_id: 123)
+      }.to_not raise_error
     end
 
-    it "has an audited_fields attribute" do
-      t = Tina.create(:badonkadonks => 2, :ladies => 1, :audited_user_id => 123)
+    it 'has an audited_fields attribute' do
+      t = Tina.create(badonkadonks: 2, ladies: 1, audited_user_id: 123)
 
-      expect(t.audited_fields).to match_array(["badonkadonks", "ladies"])
+      expect(t.audited_fields).to match_array(%w[badonkadonks ladies])
     end
 
-    context "#save" do
+    context '#save' do
       before do
         @tina = Tina.create(
-          :badonkadonks => 0,
-          :ladies => 0,
-          :audited_user_id => 123
+          badonkadonks: 0,
+          ladies: 0,
+          audited_user_id: 123
         )
         @tina.reload
       end
 
-      context "when not configured to ignore user" do
-        context "when all audited fields have changed" do
+      context 'when not configured to ignore user' do
+        context 'when all audited fields have changed' do
           before do
             @tina.badonkadonks = 1
             @tina.ladies = 1
@@ -38,42 +38,42 @@ describe SimpleAuditTrail::Auditor do
             @tina.audited_user_id = 123
           end
 
-          it "creates a SimpleAuditTrail::Audit record" do
+          it 'creates a SimpleAuditTrail::Audit record' do
             expect {
               @tina.save
             }.to change(SimpleAuditTrail::Audit, :count).by(1)
           end
 
-          context "the newly created simple_audits record" do
+          context 'the newly created simple_audits record' do
             before do
               @tina.save
             end
 
-            it "is an instance of SimpleAuditTrail::Audit" do
+            it 'is an instance of SimpleAuditTrail::Audit' do
               expect(@tina.simple_audits.last).to be_kind_of SimpleAuditTrail::Audit
             end
 
-            it "has a json hash for what the audited values were" do
-              expect(JSON.parse(@tina.simple_audits.last.from)).
-                to eq JSON.parse("{\"ladies\":0,\"badonkadonks\":0}")
+            it 'has a json hash for what the audited values were' do
+              expect(JSON.parse(@tina.simple_audits.last.from))
+                .to eq JSON.parse('{"ladies":0,"badonkadonks":0}')
             end
 
-            it "has a json hash for what the audited values are" do
-              expect(JSON.parse(@tina.simple_audits.last.to)).
-                to eq JSON.parse("{\"ladies\":1,\"badonkadonks\":1}")
+            it 'has a json hash for what the audited values are' do
+              expect(JSON.parse(@tina.simple_audits.last.to))
+                .to eq JSON.parse('{"ladies":1,"badonkadonks":1}')
             end
 
-            it "has a who_id for the user who made the change" do
+            it 'has a who_id for the user who made the change' do
               expect(@tina.simple_audits.last.who_id).to eq 123
             end
 
-            it "has an empty unchanged value" do
+            it 'has an empty unchanged value' do
               expect(JSON.parse(@tina.simple_audits.last.unchanged)).to be_empty
             end
           end
         end
 
-        context "when some but not all audited fields have changed then" do
+        context 'when some but not all audited fields have changed then' do
           before do
             @tina.badonkadonks = 1
 
@@ -82,23 +82,23 @@ describe SimpleAuditTrail::Auditor do
             @tina.save
           end
 
-          it "has a json hash in `from` for what the changed audited values were" do
-            expect(JSON.parse(@tina.simple_audits.last.from)).
-              to eq JSON.parse("{\"badonkadonks\":0}")
+          it 'has a json hash in `from` for what the changed audited values were' do
+            expect(JSON.parse(@tina.simple_audits.last.from))
+              .to eq JSON.parse('{"badonkadonks":0}')
           end
 
-          it "has a json hash in `to` for what the changed audited values are" do
-            expect(JSON.parse(@tina.simple_audits.last.to)).
-              to eq JSON.parse("{\"badonkadonks\":1}")
+          it 'has a json hash in `to` for what the changed audited values are' do
+            expect(JSON.parse(@tina.simple_audits.last.to))
+              .to eq JSON.parse('{"badonkadonks":1}')
           end
 
-          it "has a json hash in `unchanged` for what the unmodified audited values are" do
-            expect(JSON.parse(@tina.simple_audits.last.unchanged)).
-              to eq JSON.parse("{\"ladies\":0}")
+          it 'has a json hash in `unchanged` for what the unmodified audited values are' do
+            expect(JSON.parse(@tina.simple_audits.last.unchanged))
+              .to eq JSON.parse('{"ladies":0}')
           end
         end
 
-        context "when audited fields have not changed" do
+        context 'when audited fields have not changed' do
           before do
             @tina.mushy_snugglebites = "
               That's Mushy Snugglebites' badonkadonk. She's my main squeeze.
@@ -106,28 +106,28 @@ describe SimpleAuditTrail::Auditor do
              "
           end
 
-          it "does not raise an Exception even if no auditor is set" do
+          it 'does not raise an Exception even if no auditor is set' do
             @tina.audited_user_id = nil
             expect { @tina.save }.to_not raise_error
           end
 
-          it "does not create a SimpleAuditTrail::Audit record" do
-            expect{
+          it 'does not create a SimpleAuditTrail::Audit record' do
+            expect {
               @tina.save
             }.to_not change(SimpleAuditTrail::Audit, :count)
           end
         end
       end
 
-      context "when configured to ignore user" do
+      context 'when configured to ignore user' do
         before do
           @torque = MrTorque.create(
-            :todays_quote => "THAT SENTENCE HAD TOO MANY SYLLABLES! APOLOGIZE!"
+            todays_quote: 'THAT SENTENCE HAD TOO MANY SYLLABLES! APOLOGIZE!'
           )
           @torque.reload
         end
 
-        it "does not raise errors when audit_user_id is empty" do
+        it 'does not raise errors when audit_user_id is empty' do
           @torque.todays_quote =
             "Right now, you're ranked fifty in the badass leaderboards,
              which puts you behind my grandma but ahead of a guy she gummed to
@@ -136,7 +136,7 @@ describe SimpleAuditTrail::Auditor do
             @torque.save
           }.to_not raise_error
         end
-        it "does not raise errors when audit_user_id is not empty" do
+        it 'does not raise errors when audit_user_id is not empty' do
           @torque.todays_quote =
             "If you're still alive, grab some ammo. If you're not,
              THIS MESSAGE IS IRRELEVANT!"
@@ -146,7 +146,7 @@ describe SimpleAuditTrail::Auditor do
           }.to_not raise_error
         end
 
-        it "creates a SimpleAuditTrail::Audit record" do
+        it 'creates a SimpleAuditTrail::Audit record' do
           @torque.todays_quote =
             "If you're still alive, grab some ammo. If you're not,
              THIS MESSAGE IS IRRELEVANT!"
