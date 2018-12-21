@@ -39,7 +39,7 @@ module SimpleAuditTrail
 
         before_update :save_audits
         define_method :save_audits do
-          changed_audited_fields = saved_changes.slice(*audited_fields)
+          changed_audited_fields = changes_to_save.slice(*audited_fields)
 
           if changed_audited_fields.present?
             if audited_user_id.nil? && audit_options[:require_audited_user_id]
